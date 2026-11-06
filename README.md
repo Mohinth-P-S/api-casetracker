@@ -1,6 +1,7 @@
 # API CaseTracker — Support That Remembers Every API Fix
 
 > **Hack with Bangalore 4.0 Hackathon Submission**  
+> 🌐 **Live Production URL:** [https://api-casetracker.vercel.app](https://api-casetracker.vercel.app)  
 > Persistent Memory Layer: **Hindsight by Vectorize** (`hindsight-client`)  
 > Full-Stack Architecture: **FastAPI (Python) + React & TypeScript (Vite)**  
 > UI/UX System: **Editorial Engineering Atelier** (based on Figma specification)
