@@ -1,0 +1,192 @@
+{
+  "info": {
+    "_postman_id": "c8a14d5e-88b9-4d2a-a9e0-casetracker2026",
+    "name": "API CaseTracker - Hindsight Memory Flows",
+    "description": "Demonstrates customer-isolated memory flows with Hindsight for Hack with Bangalore 4.0: (1) Known issue with prior fix, (2) Customer isolation test with identical visible symptoms, (3) New issue requiring investigation, and (4) Learning loop: Retaining a confirmed resolution and recalling it on subsequent analysis.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. System Health & Memory Provider",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Checks backend status and active memory provider (Hindsight vs Demo Memory Mode)."
+      }
+    },
+    {
+      "name": "1. Customer Profiles & Memory Scopes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        },
+        "description": "Lists customer API integration profiles, auth protocols, and isolated memory bank IDs."
+      }
+    },
+    {
+      "name": "Flow 1A: Known Issue - Apex Retail (401 OAuth Key ID Mismatch)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"cust_apex_retail\",\n  \"api_name\": \"Orders & Webhooks Sync API\",\n  \"api_version\": \"v2.4\",\n  \"symptoms\": \"401 Unauthorized returned during webhook registration endpoint (POST /webhooks/subscribe). Client requests fail handshake despite valid client credentials.\",\n  \"error_message\": \"invalid_token: Token signature validation failed: kid does not match active JWKS key\",\n  \"steps_tried\": \"Verified client secret in developer portal, tested token endpoint manually via curl (200 OK), rebooted client app.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "analyze"]
+        },
+        "description": "Recalls past case CASE-1082 from Apex Retail's memory bank: Redis OAuth token cache flush."
+      }
+    },
+    {
+      "name": "Flow 1B: Customer Isolation - Beacon Financial (Same 401 Symptom -> Different Fix)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"cust_beacon_fin\",\n  \"api_name\": \"Orders & Webhooks Sync API\",\n  \"api_version\": \"v1.9 (Enterprise Legacy)\",\n  \"symptoms\": \"401 Unauthorized returned during webhook registration endpoint (POST /webhooks/subscribe). Client requests fail handshake despite valid client credentials.\",\n  \"error_message\": \"invalid_token: Certificate handshake rejected: peer certificate chain incomplete or untrusted\",\n  \"steps_tried\": \"Regenerated client API secret, verified client public IP in firewall whitelist, restarted proxy.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "analyze"]
+        },
+        "description": "Crucial isolation proof: Exact same 401 symptom for Beacon Financial recalls CASE-1094 (mTLS intermediate certificate), never leaking Apex Retail's OAuth fix!"
+      }
+    },
+    {
+      "name": "Flow 2: Unmatched Issue - Catalyst Health (504 Timeout -> Needs Investigation)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"cust_catalyst_health\",\n  \"api_name\": \"Clinical Records & Telehealth API\",\n  \"api_version\": \"v3.0\",\n  \"symptoms\": \"504 Gateway Timeout during batch transaction export (POST /api/v2/export/batch).\",\n  \"error_message\": \"gateway_timeout: Downstream worker timed out after 30000ms\",\n  \"steps_tried\": \"Checked worker thread count, increased request timeout from 30s to 60s, restarted client batch daemon.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "analyze"]
+        },
+        "description": "Returns 'needs_investigation' with zero hallucinated remedies."
+      }
+    },
+    {
+      "name": "Flow 3A: Retain Confirmed Resolution into Memory (CASE-1105)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"cust_catalyst_health\",\n  \"api_name\": \"Clinical Records & Telehealth API\",\n  \"api_version\": \"v3.0\",\n  \"symptoms\": \"504 Gateway Timeout during batch transaction export (POST /api/v2/export/batch).\",\n  \"error_message\": \"gateway_timeout: Downstream worker timed out after 30000ms\",\n  \"steps_tried\": \"Checked worker thread count, increased request timeout from 30s to 60s, restarted client batch daemon.\",\n  \"root_cause\": \"Database read replica lag exceeded 180s due to unindexed compound query on export_status + organization_id, triggering upstream gateway timeout.\",\n  \"verified_fix\": \"Added compound B-tree index on (organization_id, export_status, created_at) and set query MAX_EXECUTION_TIME = 15000.\",\n  \"verified_by\": \"Elena Rostova (Senior Integration Specialist)\",\n  \"case_id\": \"CASE-1105\",\n  \"title\": \"Batch Export 504: Database Read Replica Lag & Missing Compound Index\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/CASE-1105/resolution",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "CASE-1105", "resolution"]
+        },
+        "description": "Retains human-confirmed root cause and resolution into Hindsight customer bank (casetracker-cust-catalyst-health)."
+      }
+    },
+    {
+      "name": "Flow 3B: Recall Newly Learned Fix - Catalyst Health (504 Batch Export)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"cust_catalyst_health\",\n  \"api_name\": \"Clinical Records & Telehealth API\",\n  \"api_version\": \"v3.0\",\n  \"symptoms\": \"504 Gateway Timeout during batch transaction export (POST /api/v2/export/batch).\",\n  \"error_message\": \"gateway_timeout: Downstream worker timed out after 30000ms\",\n  \"steps_tried\": \"Checked worker thread count, increased request timeout from 30s to 60s.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "analyze"]
+        },
+        "description": "Proof of persistent learning: The exact same issue that previously returned 'needs_investigation' now immediately recalls CASE-1105 with the verified compound B-tree index fix!"
+      }
+    },
+    {
+      "name": "Frequent Problems & Recurrence Analysis",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "problems"]
+        },
+        "description": "Lists ranked recurring problems with occurrence counts and severity."
+      }
+    },
+    {
+      "name": "Verified Fixes Catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/verified-fixes",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "verified-fixes"]
+        },
+        "description": "Catalog of confirmed fixes, root causes, engineer sign-offs, and outcomes."
+      }
+    },
+    {
+      "name": "Dashboard Figures & Trends",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/dashboard",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "dashboard"]
+        },
+        "description": "Dashboard overview statistics, memory recall hit rate, and monthly trend data."
+      }
+    }
+  ]
+}

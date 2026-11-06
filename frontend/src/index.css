@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-ivory: #FAF8F5;
+    --bg-card: #FFFFFF;
+    --bg-muted: #F4EFE6;
+    --bg-subtle: #EFE9DE;
+    --border-warm: #E2DBD0;
+    --border-strong: #CDC4B5;
+    
+    --forest-900: #0E2218;
+    --forest-800: #163324;
+    --forest-700: #1B3B2B;
+    --forest-600: #264E3A;
+    --forest-500: #36674E;
+    
+    --sage-700: #42584A;
+    --sage-600: #546E5E;
+    --sage-500: #6D8A78;
+    --sage-200: #DCE5DF;
+    --sage-100: #ECF1EE;
+    --sage-50:  #F5F8F6;
+    
+    --burnt-orange: #C45525;
+    --burnt-orange-hover: #AB481D;
+    --burnt-orange-light: #FDF1EA;
+    --burnt-orange-border: #F3CCB8;
+    
+    --amber-accent: #D97706;
+    --amber-light: #FEF3C7;
+    --amber-border: #FCD34D;
+    
+    --text-primary: #18261E;
+    --text-secondary: #4A5B51;
+    --text-muted: #728479;
+    --text-light: #94A39A;
+
+    --font-serif: 'Playfair Display', 'Merriweather', Georgia, Cambria, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  body {
+    background-color: var(--bg-ivory);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .font-serif-heading {
+    font-family: var(--font-serif);
+    letter-spacing: -0.015em;
+  }
+
+  code, pre, .font-mono-api {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom craftsmanship scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-muted);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sage-500);
+}
