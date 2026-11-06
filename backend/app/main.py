@@ -1,10 +1,10 @@
 import os
 import logging
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from app.config import settings
 from app.routes import analyze, resolution, customers, problems, verified_fixes, dashboard
 from app.hindsight_service import hindsight_service
@@ -61,21 +61,29 @@ def health():
         "demo_mode": not hindsight_service.is_live
     }
 
-# Mount static frontend build if present
-frontend_dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
-if frontend_dist.exists() and (frontend_dist / "index.html").exists():
-    logger.info(f"Serving production frontend from {frontend_dist}")
-    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+# Static file serving: Check backend/app/static first, then fallback to frontend/dist
+static_dir = Path(__file__).resolve().parent / "static"
+if not (static_dir / "index.html").exists():
+    static_dir = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+
+if static_dir.exists() and (static_dir / "index.html").exists():
+    logger.info(f"Serving static assets from {static_dir}")
+    assets_dir = static_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/")
+    def serve_root():
+        return FileResponse(str(static_dir / "index.html"))
 
     @app.get("/{full_path:path}")
     def serve_frontend_spa(full_path: str):
-        # Do not intercept API routes
         if full_path.startswith("api"):
-            return {"detail": "Not Found"}
-        target_file = frontend_dist / full_path
+            return JSONResponse(status_code=404, content={"detail": f"API endpoint /{full_path} not found"})
+        target_file = static_dir / full_path
         if target_file.is_file():
             return FileResponse(str(target_file))
-        return FileResponse(str(frontend_dist / "index.html"))
+        return FileResponse(str(static_dir / "index.html"))
 
 if __name__ == "__main__":
     import uvicorn
