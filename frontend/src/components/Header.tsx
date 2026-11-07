@@ -40,9 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, systemS
       {/* Top broadsheet line */}
       <div className="max-w-[1440px] mx-auto px-6 py-2.5 flex items-center justify-between border-b border-[#EAE3D9] text-xs font-mono text-[#5E7D6D]">
         <div className="flex items-center space-x-3">
-          <span className="font-semibold text-[#1E3A2F] uppercase tracking-wider">HACK WITH BANGALORE 4.0</span>
-          <span className="text-[#c1c8c3]">•</span>
-          <span className="text-[#4A554E]">PERSISTENT MEMORY LAYER: HINDSIGHT ENGINE</span>
+          <span className="font-semibold text-[#1E3A2F] uppercase tracking-wider">PERSISTENT MEMORY LAYER: HINDSIGHT ENGINE</span>
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1.5">

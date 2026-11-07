@@ -85,7 +85,7 @@ export function App() {
               API CaseTracker — Editorial Engineering Atelier
             </div>
             <p>
-              Built for Hack with Bangalore 4.0 • Persistent Memory Layer powered by Hindsight Python Client
+              Persistent Memory Layer powered by Hindsight Python Client
             </p>
           </div>
 
