@@ -24,27 +24,18 @@ class VercelPathMiddleware:
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
             raw_qs = scope.get("query_string", b"").decode("utf-8")
-            qs = parse_qs(raw_qs)
+            qs = parse_qs(raw_qs, keep_blank_values=True)
             
             # Check for path parameter from Vercel rewrite
-            if "path" in qs and qs["path"]:
-                raw_subpath = qs["path"][0]
+            if "path" in qs:
+                raw_subpath = qs["path"][0] if qs["path"] else ""
                 subpath = raw_subpath.lstrip("/")
 
                 # Reconstruct full path
-                if not subpath:
+                if not subpath or subpath == "index.html":
                     scope["path"] = "/"
-                elif subpath.startswith("assets/") or subpath.startswith("api/"):
-                    scope["path"] = f"/{subpath}"
-                elif subpath in ["favicon.svg", "icons.svg", "index.html"]:
-                    scope["path"] = f"/{subpath}"
-                elif (subpath.startswith("health") or 
-                      subpath.startswith("customers") or 
-                      subpath.startswith("problems") or 
-                      subpath.startswith("dashboard") or 
-                      subpath.startswith("verified-fixes") or 
-                      subpath.startswith("issues")):
-                    scope["path"] = f"/api/{subpath}"
+                elif subpath == "api" or subpath == "api/":
+                    scope["path"] = "/api"
                 else:
                     scope["path"] = f"/{subpath}"
 
@@ -53,7 +44,7 @@ class VercelPathMiddleware:
                 scope["query_string"] = urlencode(qs, doseq=True).encode("utf-8")
                 
             elif scope.get("path") in ["/api/index.py", "/api/index", "/api/"]:
-                scope["path"] = "/api"
+                scope["path"] = "/"
 
         await self.app(scope, receive, send)
 
