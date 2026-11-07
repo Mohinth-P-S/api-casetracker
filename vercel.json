@@ -3,16 +3,16 @@
   "outputDirectory": "backend/app/static",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index.py"
+      "source": "/api",
+      "destination": "/api/index.py?path="
     },
     {
-      "source": "/assets/:path*",
-      "destination": "/api/index.py"
+      "source": "/api/:match*",
+      "destination": "/api/index.py?path=:match*"
     },
     {
-      "source": "/:path*",
-      "destination": "/api/index.py"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
