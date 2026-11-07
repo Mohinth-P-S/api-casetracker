@@ -2,7 +2,7 @@
 
 > **Hack with Bangalore 4.0 Hackathon Submission**  
 > 🌐 **Live Production URL:** [https://api-casetracker.vercel.app](https://api-casetracker.vercel.app)  
-> 📝 **Published Technical Article:** [Read on Dev.to](https://dev.to/mohinth_ps_20d0c25911150b/api-casetracker-eliminating-api-support-rediscovery-with-customer-partitioned-persistent-memory-2lnb)  
+> 📝 **Published Technical Article:** [Why I Replaced Global RAG With Hindsight Memory Banks](https://dev.to/mohinth_ps_20d0c25911150b/why-i-replaced-global-rag-with-hindsight-memory-banks-22nf)  
 > Persistent Memory Layer: **Hindsight by Vectorize** (`hindsight-client`)  
 > Full-Stack Architecture: **FastAPI (Python) + React & TypeScript (Vite)**  
 > UI/UX System: **Editorial Engineering Atelier** (based on Figma specification)
