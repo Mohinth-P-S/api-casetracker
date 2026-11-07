@@ -61,6 +61,15 @@ def health():
         "demo_mode": not hindsight_service.is_live
     }
 
+@app.get("/api/debug-scope")
+def debug_scope(request: Request):
+    return {
+        "headers": dict(request.headers),
+        "url": str(request.url),
+        "path": request.url.path,
+        "query_params": dict(request.query_params)
+    }
+
 # Static file serving: Check backend/app/static first, then fallback to frontend/dist
 static_dir = Path(__file__).resolve().parent / "static"
 if not (static_dir / "index.html").exists():
